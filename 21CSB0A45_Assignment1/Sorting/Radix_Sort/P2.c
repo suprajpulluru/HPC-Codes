@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define SIZE 1000
+#define SIZE 100
 
 pthread_mutex_t mutex;
 
@@ -14,7 +14,6 @@ struct thread_args
 	int exp;
 	int i;
 };
-
 
 int get_max(int *arr, int n)
 {
@@ -95,9 +94,9 @@ int main()
 	fclose(file);
 
 	RadixSort(A, SIZE);
-	
-    for (int i = 0; i < SIZE; i++)
-			printf("%d\t", A[i]);
+
+	for (int i = 0; i < SIZE; i++)
+		printf("%d\t", A[i]);
 
 	return 0;
 }

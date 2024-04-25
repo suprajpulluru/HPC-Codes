@@ -3,46 +3,63 @@
 
 #define N 1024
 
-int* A;
-
-void swap(int a,int b,int order){
-	if(order && A[b] < A[a]){
-		int temp=A[b];
-		A[b]=A[a];
-		A[a]=temp;
+void swap(int *A, int l, int r, int order)
+{
+	if (order == 1 && A[l] > A[r])
+	{
+		int temp = A[l];
+		A[l] = A[r];
+		A[r] = temp;
 	}
-	if(!order && A[a] < A[b]){
-		int temp=A[b];
-		A[b]=A[a];
-		A[a]=temp;
+	else if (order == 0 && A[l] < A[r])
+	{
+		int temp = A[l];
+		A[l] = A[r];
+		A[r] = temp;
 	}
 }
 
-void bitonicSort(int s,int e,int dir){
-	int n=e-s+1;
-	if(n==1)return;
-	for(int i=s;(i-s)<n/2;i++)swap(i,n/2+i,dir);
-	bitonicSort(s,s+n/2-1,dir);
-	bitonicSort(s+n/2,e,dir);
+void BitonicSort(int *A, int l, int r, int order)
+{
+	int n = r - l + 1;
+	if (n == 1)
+		return;
+	for (int i = l; i < l + n / 2; i++)
+		swap(A, i, i + n / 2, order);
+	BitonicSort(A, l, l + n / 2 - 1, order);
+	BitonicSort(A, l + n / 2, r, order);
 }
 
-void bitonicSequenceSort(int s,int e){
-	int n=e-s+1;
-	for(int j=2;j<=n;j*=2){
-		for(int i=0;i<n;i+=j){
-			if(((i/j)%2) == 0)bitonicSort(i,i+j-1,1);
-			else bitonicSort(i,i+j-1,0);
+void BitonicSequenceGenerator(int *A, int l, int r)
+{
+	int n = r - l + 1;
+	for (int j = 2; j <= n; j = j * 2)
+	{
+		for (int i = 0; i < n; i = i + j)
+		{
+			if ((i / j) % 2 == 0)
+				BitonicSort(A, i, i + j - 1, 1);
+			else
+				BitonicSort(A, i, i + j - 1, 0);
 		}
 	}
 }
 
-int main(){
-	A=malloc(N*sizeof(int));
+int main()
+{
+	FILE *fin = fopen("Input.txt", "r");
+	if (!fin)
+	{
+		printf("File cannot be open\n");
+		exit(EXIT_FAILURE);
+	}
 
-	FILE* fin=fopen("Input.txt","r");
-	for(int i=0;i<N;i++)fscanf(fin,"%d",&A[i]);
-	
-	bitonicSequenceSort(0,N-1);
-	
-	for(int i=0;i<N;i++)printf("%d ",A[i]);
+	int *A = malloc(N * sizeof(int));
+	for (int i = 0; i < N; i++)
+		fscanf(fin, "%d", &A[i]);
+
+	BitonicSequenceGenerator(A, 0, N - 1);
+
+	for (int i = 0; i < N; i++)
+		printf("%d\n", A[i]);
 }

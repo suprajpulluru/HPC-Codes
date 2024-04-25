@@ -2,85 +2,58 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define SIZE 10000
+#define N 10000
 
-struct thread_args
-{
+struct thread_args{
 	int i;
-	int *arr;
-	int size;
+	int* A;
 	int res;
 };
 
 
-void *find_pos(void *args)
-{
+void *find_pos(void *args){
 	struct thread_args *arg = (struct thread_args *)args;
-	int *A = arg->arr;
-	int i = arg->i;
-	int size = arg->size;
+	int* A=arg->A;
+	int i=arg->i;
 
-	int cmp = A[i];
-	int pos = 0;
-	for (int j = 0; j < size; j++)
-	{
-		if (i != j)
-		{
-			if (A[j] < cmp)
-				pos++;
-			else if (A[j] == cmp && i > j)
-				pos++;
-		}
+	int pos=0;
+	for(int j=0;j<N;j++){
+		if(A[j] < A[i])pos++;
+		else if (A[j] == A[i] && i > j)pos++;
 	}
-	arg->res = pos;
+	arg->res=pos;
 	pthread_exit(NULL);
 }
 
-void EnumerationSort(int *A, int *B, int size)
-{
-	pthread_t tid[size];
-	struct thread_args args[size];
+void EnumerationSort(int* A,int* B){
+	pthread_t tid[N];
+	struct thread_args args[N];
 
-	for (int i = 0; i < size; i++)
-	{
-		args[i].arr = A;
-		args[i].i = i;
-		args[i].size = size;
-
-		pthread_create(&tid[i], NULL, find_pos, (void *)&args[i]);
+	for(int i=0;i<N;i++){
+		args[i].A=A;
+		args[i].i=i;
+		pthread_create(&tid[i],NULL,find_pos,(void *)&args[i]);
 	}
 
-	for (int i = 0; i < size; i++)
-	{
-		pthread_join(tid[i], NULL);
-		B[args[i].res] = A[i];
+	for(int i=0;i<N;i++){
+		pthread_join(tid[i],NULL);
+		B[args[i].res]=A[i];
 	}
 }
 
-int main()
-{
-	FILE *file = fopen("Input.txt", "r");
+int main(){
+	FILE *file=fopen("Input.txt", "r");
 
-    int *A = malloc(SIZE * sizeof(int));
-	int *B = malloc(SIZE * sizeof(int));
+    int* A = malloc(N * sizeof(int));
+	int* B = malloc(N * sizeof(int));
 
-	int val;
-	for (int i = 0; i < SIZE; i++)
-	{
-		fscanf(file, "%d", &val);
-		A[i] = val;
-		B[i] = 0;
+	for(int i=0;i<N;i++){
+		fscanf(file,"%d",&A[i]);
+		B[i]=0;
 	}
 	fclose(file);
 
-    EnumerationSort(A, B, SIZE);
+    EnumerationSort(A,B);
 	
-    for (int i = 0; i < SIZE; i++)
-		if ((i + 1) % 10 == 0)
-			printf("%d\n", B[i]);
-		else
-			printf("%d\t", B[i]);
-
-	return 0;
-
+    for(int i=0;i<N;i++)printf("%d\n",B[i]);
 }

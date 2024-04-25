@@ -1,71 +1,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SIZE 1000000
+#define N 100
 
-
-int get_max(int *arr, int n)
+int get_max(int *A)
 {
-	int mx = arr[0];
-	for (int i = 1; i < n; i++){
-		if (arr[i] > mx){
-			mx = arr[i];
-        }
-    }
+	int mx = A[0];
+	for (int i = 1; i < N; i++)
+		if (A[i] > mx)
+			mx = A[i];
 	return mx;
 }
 
-void count_sort(int *arr, int n, int exp)
+void enumeration_sort(int *A, int exp, int r)
 {
-	int output[n];
-	int i, count[10] = {0};
+	int output[N];
+	int count_size = 1 << r;
+	int count[count_size];
 
-	for (i = 0; i < n; i++){
-		count[(arr[i] / exp) % 10]++;
-    }
+	for (int i = 0; i < count_size; i++)
+		count[i] = 0;
 
-	for (i = 1; i < 10; i++){
+	for (int i = 0; i < N; i++)
+		count[(A[i] >> exp) & (count_size - 1)]++;
+
+	for (int i = 1; i < count_size; i++)
 		count[i] += count[i - 1];
-    }
 
-	for (i = n - 1; i >= 0; i--)
+	for (int i = N - 1; i >= 0; i--)
 	{
-		output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-		count[(arr[i] / exp) % 10]--;
+		output[count[(A[i] >> exp) & (count_size - 1)] - 1] = A[i];
+		count[(A[i] >> exp) & (count_size - 1)]--;
 	}
 
-	for (i = 0; i < n; i++){
-		arr[i] = output[i];
-    }
+	for (int i = 0; i < N; i++)
+		A[i] = output[i];
 }
 
-void RadixSort(int *arr, int n)
+void RadixSort(int *A, int r)
 {
-	int m = get_max(arr, n);
+	int m = get_max(A);
 
-	for (int exp = 1; m / exp > 0; exp *= 10)
-		count_sort(arr, n, exp);
+	int num_bits = 0;
+	while ((m >> num_bits) > 0)
+		num_bits += r;
+
+	for (int exp = 0; exp < num_bits; exp += r)
+		enumeration_sort(A, exp, r);
 }
 
 int main()
 {
-	int *A = malloc(SIZE * sizeof(int));
+	int *A = malloc(N * sizeof(int));
 
-	FILE *file = fopen("Input.txt", "r");
-	int val;
-	for (int i = 0; i < SIZE; i++)
+	FILE *fin = fopen("Input.txt", "r");
+	if (!fin)
 	{
-		fscanf(file, "%d", &val);
-		A[i] = val;
+		printf("Error opening file.\n");
+		return 1;
 	}
-	fclose(file);
+	for (int i = 0; i < N; i++)
+		fscanf(fin, "%d", &A[i]);
+	fclose(fin);
 
-	RadixSort(A, SIZE);
-	
-    for (int i = 0; i < SIZE; i++){
-		printf("%d\t", A[i]);
-    }
+	RadixSort(A, 2);
 
-
-	return 0;
+	for (int i = 0; i < N; i++)
+		printf("%d\n", A[i]);
 }
