@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define SIZE 1000000
-#define N_BUCKETS 20
-
+#define SIZE 100
+#define N_BUCKETS 10
 
 struct s_args
 {
@@ -98,8 +97,10 @@ void bucketSort(int *A, int size)
 	int *sample = (int *)malloc(N_BUCKETS * (N_BUCKETS - 1) * sizeof(int));
 	start = 0;
 	int space = ((size / N_BUCKETS) / N_BUCKETS);
-	for (int i = 0; i < N_BUCKETS; i++){
-		for (int j = 0; j < N_BUCKETS - 1; j++){
+	for (int i = 0; i < N_BUCKETS; i++)
+	{
+		for (int j = 0; j < N_BUCKETS - 1; j++)
+		{
 			sample[start++] = A[init_part[i].low + (j + 1) * space];
 		}
 	}
@@ -130,7 +131,8 @@ void bucketSort(int *A, int size)
 				break;
 			}
 		}
-		if (!added){
+		if (!added)
+		{
 			buckets[N_BUCKETS - 1][bucket_length[N_BUCKETS - 1]++] = A[i];
 		}
 	}
@@ -143,16 +145,19 @@ void bucketSort(int *A, int size)
 		final_part[i].arr = buckets[i];
 		final_part[i].low = 0;
 		final_part[i].high = bucket_length[i] - 1;
-		pthread_create(&fid[i], NULL, (void*)bucketSort, (void *)&final_part[i]);
+		pthread_create(&fid[i], NULL, (void *)bucketSort, (void *)&final_part[i]);
 	}
 
-	for (int i = 0; i < N_BUCKETS; i++){
+	for (int i = 0; i < N_BUCKETS; i++)
+	{
 		pthread_join(fid[i], NULL);
 	}
 
 	int counter = 0;
-	for (int i = 0; i < N_BUCKETS; i++){
-		for (int j = 0; j < bucket_length[i]; j++){
+	for (int i = 0; i < N_BUCKETS; i++)
+	{
+		for (int j = 0; j < bucket_length[i]; j++)
+		{
 			A[counter++] = buckets[i][j];
 		}
 	}
@@ -161,7 +166,7 @@ void bucketSort(int *A, int size)
 int main()
 {
 
-    FILE *file = fopen("../Input.txt", "r");
+	FILE *file = fopen("../Input.txt", "r");
 
 	int *A = malloc(SIZE * sizeof(int));
 
@@ -174,8 +179,8 @@ int main()
 	fclose(file);
 
 	bucketSort(A, SIZE);
-	
-    for (int i = 0; i < SIZE; i++)
+
+	for (int i = 0; i < SIZE; i++)
 		if ((i + 1) % 20 == 0)
 			printf("%d\n", A[i]);
 		else
